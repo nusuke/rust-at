@@ -8,8 +8,13 @@ pub fn main() {
         }
         s1.trim_end().to_owned()
     };
+    let res = answer(input);
+    println!("{}", res);
+}
 
+fn answer(input: String) -> String {
     let arr = input.split("\n");
+    let mut result = "".to_string();
     for (i, row) in arr.enumerate() {
         let res = match row.find("*") {
             Some(index) => index + 1,
@@ -17,11 +22,12 @@ pub fn main() {
         };
 
         if res < 99 {
-            println!("{}", conver_row(res) + &(7 - i + 1).to_string());
+            result = conver_row(res) + &(7 - i + 1).to_string();
+            break;
         }
     }
+    return result;
 }
-
 fn conver_row(n: usize) -> String {
     if n == 1 {
         "a".to_string()
@@ -39,5 +45,30 @@ fn conver_row(n: usize) -> String {
         "g".to_string()
     } else {
         "h".to_string()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::abc296::b::answer;
+
+    #[test]
+    fn it_works_1() {
+        let input =
+            "........\n........\n........\n........\n........\n........\n........\n*.......\n"
+                .to_string();
+        let res = answer(input);
+        // 出力結果を比較する
+        assert_eq!(res, "a1");
+    }
+
+    #[test]
+    fn it_works_2() {
+        let input =
+            "........\n........\n........\n........\n........\n.*......\n........\n........"
+                .to_string();
+        let res = answer(input);
+        // 出力結果を比較する
+        assert_eq!(res, "b3");
     }
 }
