@@ -1,4 +1,5 @@
 // https://atcoder.jp/contests/abc296/tasks/abc296_d
+#[allow(dead_code)]
 pub fn main() {
     let input = {
         let mut s1 = String::new();
@@ -17,53 +18,73 @@ fn answer(input: String) -> String {
         let m: i64 = ws.next().unwrap().parse().unwrap();
         (n, m)
     };
-    // 一番大きい積でmに達するか調べる
-    if n * n < m {
-        return String::from("-1");
-    }
 
-    // * 1で到達できる場合
-    if n >= m {
-        return m.to_string();
-    };
-
-    let mut result = String::new();
-    // 余り無しmを作れる場合
-    for i in 2..=n {
-        // println!("{}/{}={} あまりは{}", m, i, m / i, m % i);
-        if m % i == 0 && m / i <= n {
-            result = m.to_string();
+    let inf = 999999999999999999;
+    let mut ans = inf;
+    for i in 1..=n {
+        println!("x={},i={}", (m + i - 1) / i, i);
+        let x = (m + i - 1) / i;
+        if x <= n {
+            ans = if ans < i * x { ans } else { i * x }
+        }
+        if i > x {
             break;
         }
     }
-    if !result.is_empty() {
-        return result;
+
+    if ans == inf {
+        return "-1".to_string();
+    } else {
+        return ans.to_string();
     }
 
-    // 余りが有る場合
-    let mut remainder = m;
-    for i in (2..=n).rev() {
-        if remainder == 1 {
-            break;
-        }
-        if m / i == 1 {
-            continue;
-        };
-        let target = m / i + 1;
+    // if n * n < m {
+    //     return String::from("-1");
+    // }
 
-        if target > n {
-            break;
-        }
+    // if n >= m {
+    //     return m.to_string();
+    // };
 
-        let sa = i * target - m;
-        println!("{}*{}-{}={}", i, target, m, sa);
-        if remainder > sa {
-            remainder = sa;
-        }
-    }
-    return (m + remainder).to_string();
+    // let mut result = 0;
+    // for i in 2..=n {
+    //     if m % i == 0 && m / i <= n {
+    //         result = m;
+    //         break;
+    //     }
+    // }
+    // if result != 0 {
+    //     return result.to_string();
+    // }
+
+    // // あまり
+    // let mut remainder = m;
+
+    // for i in (1..=n).rev() {
+    //     println!(
+    //         "{}*{}={}。目指す数値は{}。あまりは{}",
+    //         m / i + 1,
+    //         i,
+    //         (m / i + 1) * i,
+    //         m,
+    //         ((m / i + 1) * i) - m
+    //     );
+    //     if remainder == 1 {
+    //         break;
+    //     }
+
+    //     let target = m / i + 1;
+    //     if target > i {
+    //         break;
+    //     }
+
+    //     let sa = i * target - m;
+    //     if remainder > sa {
+    //         remainder = sa;
+    //     }
+    // }
+    // return (m + remainder).to_string();
 }
-
 #[cfg(test)]
 mod tests {
     use crate::abc296::d::answer;
@@ -125,4 +146,14 @@ mod tests {
         // assert
         assert_eq!(res, "2303");
     }
+
+    #[test]
+    fn it_multiplication_5() {
+        let input = "200 2003".to_string();
+        let res = answer(input);
+        // assert
+        assert_eq!(res, "2004");
+    }
 }
+
+// 99999999 100000000007

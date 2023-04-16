@@ -1,4 +1,5 @@
 // https://atcoder.jp/contests/abc296/tasks/abc296_a
+#[allow(dead_code)]
 pub fn main() {
     let input = {
         let mut _s = String::new();
