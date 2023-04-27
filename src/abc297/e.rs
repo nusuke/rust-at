@@ -1,3 +1,8 @@
+use std::{
+    cmp::Reverse,
+    collections::{BinaryHeap, HashSet},
+};
+
 // https://atcoder.jp/contests/abc297/tasks/abc297_d
 #[allow(dead_code)]
 pub fn main() {
@@ -14,12 +19,12 @@ pub fn main() {
 }
 
 fn answer(input: String) -> String {
-    let (_n, k, mut a) = {
+    let (n, k, a) = {
         let mut ws = input.split_whitespace();
-        let n: i64 = ws.next().unwrap().parse().unwrap();
+        let n: usize = ws.next().unwrap().parse().unwrap();
         let m: usize = ws.next().unwrap().parse().unwrap();
-        let mut a = ws.map(|s| s.parse().unwrap()).collect::<Vec<i64>>();
-        a.sort_by(|a, b| b.cmp(a));
+        let mut a = ws.map(|s| s.parse().unwrap()).collect::<Vec<usize>>();
+        a.sort();
         (n, m, a)
     };
 
@@ -27,89 +32,25 @@ fn answer(input: String) -> String {
         return k.to_string();
     };
 
-    static INF: i64 = 999999999999999999;
-    let mut ans = vec![INF; k];
-    let mut left: usize = 0;
-    let mut right: usize = 0;
-    for i in 0..k {
-        println!(
-            "i={} left={} right={} {}+{}={}",
-            i,
-            left,
-            right,
-            ans[left],
-            ans[right],
-            ans[left] + ans[right]
-        );
+    let mut ans: BinaryHeap<Reverse<usize>> = BinaryHeap::new();
+    let mut used = HashSet::new();
 
-        let last = match a.last() {
-            Some(n) => *n,
-            None => INF,
-        };
-        if ans[left] + ans[right] < last {
-            ans[i] = ans[left] + ans[right];
-            if right < k - 1 {
-                right = right + 1;
-            } else {
-                left += 1;
-                // right = 0;
+    ans.push(Reverse(0));
+
+    for _i in 0..k {
+        let pop = ans.pop().unwrap().0;
+        for ni in 0..n {
+            let res = pop + a[ni];
+            if !used.contains(&res) {
+                ans.push(Reverse(res));
+                used.insert(res);
             }
-        } else {
-            let poped = match a.pop() {
-                Some(n) => n,
-                None => INF,
-            };
-            ans[i] = poped;
         }
     }
-    println!("{:?}", ans);
 
-    return ans[k - 1].to_string();
-
-    // let a_eles = a.clone().split_off(1);
-    // let c = get_amari(a_eles.clone(), a[0] * k);
-
-    // let min = (a[0] * (k - c)).abs();
-    // let plus_index = get_amari(a_eles.clone(), min);
-    // let min_index = if min / a[0] == 1 {
-    //     0
-    // } else {
-    //     min / a[0] + plus_index
-    // };
-
-    // let key = if k - min_index - 1 >= 0 {
-    //     k - min_index - 1
-    // } else {
-    //     0
-    // } as usize;
-
-    // println!(
-    //     "c={} 最小値{} ←index{}  求める値のindexは{}",
-    //     c, min, min_index, key
-    // );
-
-    // let r = (min..=a[0] * k)
-    //     .into_iter()
-    //     .filter(|&i| {
-    //         let r: Vec<&i64> = a
-    //             .iter()
-    //             .filter(|&ele| i % ele == 0 || (i - ele) % a[0] == 0)
-    //             .collect::<Vec<&i64>>();
-    //         r.len() > 0
-    //     })
-    //     .take(key + 1)
-    //     .collect::<Vec<i64>>();
-
-    // println!("{:?}", r);
-    // return r[key].to_string();
+    return ans.pop().unwrap().0.to_string();
 }
 
-// fn get_amari(array: Vec<i64>, n: i64) -> i64 {
-//     return array
-//         .iter()
-//         .map(|ele| n / ele)
-//         .fold(0, |left, right| left + right);
-// }
 #[cfg(test)]
 mod tests {
     use crate::abc297::e::answer;
@@ -123,6 +64,14 @@ mod tests {
     }
 
     #[test]
+    fn e_1_2() {
+        let input = "4 7\n20 25 30 100".to_string();
+        let res = answer(input);
+        // assert
+        assert_eq!(res, "55");
+    }
+
+    #[test]
     fn e_2() {
         let input = "2 10\n2 1".to_string();
         let res = answer(input);
@@ -132,8 +81,7 @@ mod tests {
 
     #[test]
     fn e_3() {
-        let input = "10 200000\n955277671 764071525 871653439 819642859 703677532 515827892 127889502 881462887 330802980 503797872
-        ".to_string();
+        let input = "10 200000\n955277671 764071525 871653439 819642859 703677532 515827892 127889502 881462887 330802980 503797872".to_string();
         let res = answer(input);
         // assert
         assert_eq!(res, "5705443819");
@@ -189,6 +137,13 @@ j= 11では、
 20 25 30 100
 
 let graph = vec![
+    vec![0]
+    0 vec![20,25,30]
+    20 vec![25,30,40,45,50]
+    25 vec![30,40,45,50,55]
+];
+
+let graph = vec![
     vec![]
     vec![20] 0
     vec![20,25] 0
@@ -196,6 +151,19 @@ let graph = vec![
     vec![20,25,30,40] 1 + 1
     vec![20,25,30,40.45] 1 + 2
     vec![20,25,30,40,45,50] 1 + 3
-    vec![20,25,30,40,45,50,55] 2 + 3
+    vec![20,25,30,40,45,50,55] 2 + 3 < 1 + 4
+    vec![20,25,30,40,45,50,55, 60] 3 + 3
 ];
+ */
+
+/*
+[999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999]
+0[3, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999]
+0+0[3, 6, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999]
+0+1[3, 6, 9, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999]
+1+1[3, 6, 9, 12, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999]
+0[3, 6, 9, 12, 13, 999999999999999999, 999999999999999999, 999999999999999999, 999999999999999999]
+1+2 or 4+0[3, 6, 9, 12, 13, 15, 999999999999999999, 999999999999999999, 999999999999999999]
+2+2 or 4+0 [3, 6, 9, 12, 13, 15, 18, 999999999999999999, 999999999999999999]
+[3, 6, 9, 12, 13, 15, 18, 21, 999999999999999999]
  */
